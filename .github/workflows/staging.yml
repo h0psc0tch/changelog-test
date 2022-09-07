@@ -1,6 +1,10 @@
+#- name: Download workflow artifact
+#  uses: dawidd6/action-download-artifact@v2.23.0
+#
+#
 # This is a basic workflow that is manually triggered
 
-name: Prod simulation
+name: Staging simulation
 
 # Controls when the action will run. Workflow runs when manually triggered using the UI
 # or API.
@@ -17,17 +21,23 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "greet"
-  persist-sha:
+  retrieve-sha:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Runs a single command using the runners shell
-    - name: 'Save sha'
-      run: echo "${{ github.event.inputs.sha }}" >> production-sha.txt
-    - name: 'Upload sha artifact'
-      uses: actions/upload-artifact@v3
-      with:
-        name: production-sha
-        path: production-sha.txt
+      # Runs a single command using the runners shell
+      - name: 'Download workflow artifact'
+        uses: dawidd6/action-download-artifact@v2.23.0
+        with:
+          # Optional, workflow file name or ID
+          # If not specified, will be inferred from run_id (if run_id is specified), or will be the current workflow
+          workflow: prod.yml
+          name: production-sha
+      - name: 'Set variables'
+        run: |
+            SHA=$(cat production-sha.txt)
+            echo "DEPLOYSHA=$SHA" >> $GITHUB_ENV
+      - name: 'Display sha'
+        run: echo "${{ env.DEPLOYSHA }}"
