@@ -33,12 +33,18 @@ jobs:
         with:
           workflow: prod.yml            #this is the name of the production deployment github action
           name: prod-deployment-sha     #this is the name of the artifact within that action run
+          if_no_artifact_found: warn    #don't want to fail a deployment if no artifact found, so warn
 
       # Read the value from the downloaded artifact into a variable
       - name: 'Set variables'
+        continue-on-error: true
         run: |
-            SHA=$(cat prod-deployment-sha.txt)
-            echo "DEPLOYSHA=$SHA" >> $GITHUB_ENV
+            if [ -f prod-deployment-sha.txt ]; then
+              SHA=$(cat prod-deployment-sha.txt)
+              echo "DEPLOYSHA=$SHA" >> $GITHUB_ENV
+            else
+              exit 1
+            fi
 
       # Checkout the repo in order to run a git revision history command on it in the next step
       - name: Checkout
