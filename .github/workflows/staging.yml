@@ -44,7 +44,5 @@ jobs:
           echo Production Deployment SHA "${{ env.DEPLOYSHA }}"
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.inputs.sha }}
       - name: 'Show changelog'
         run: scripts/git/changelog.sh ${{ env.DEPLOYSHA }} ${{ github.event.inputs.sha }}
