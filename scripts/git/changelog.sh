@@ -2,6 +2,7 @@
 
 if [ "main" != $(git rev-parse --abbrev-ref HEAD) ]; then
   echo "cannot generate changelog outside of main"
+  git rev-parse --abbrev-ref HEAD
   exit
 fi
 
