@@ -21,30 +21,31 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "greet"
-  retrieve-sha:
+  changelog:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Runs a single command using the runners shell
+      # Download the artifact, from the last production deployment, which contains the SHA for that deployment
       - name: 'Download workflow artifact'
         uses: dawidd6/action-download-artifact@v2.23.0
         with:
-          # Optional, workflow file name or ID
-          # If not specified, will be inferred from run_id (if run_id is specified), or will be the current workflow
-          workflow: prod.yml
-          name: prod-deployment-sha
+          workflow: prod.yml            #this is the name of the production deployment github action
+          name: prod-deployment-sha     #this is the name of the artifact within that action run
+
+      # Read the value from the downloaded artifact into a variable
       - name: 'Set variables'
         run: |
             SHA=$(cat prod-deployment-sha.txt)
             echo "DEPLOYSHA=$SHA" >> $GITHUB_ENV
-      - name: 'Display sha'
-        run: > 
-          echo Production Deployment SHA "${{ env.DEPLOYSHA }}"
+
+      # Checkout the repo in order to run a git revision history command on it in the next step
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0 #this is required to ensure that the necessary history is pulled down
+
+      # Generate the changelog between the two SHAs, production deployment and current deployment
       - name: 'Show changelog'
         run: scripts/git/changelog.sh ${{ env.DEPLOYSHA }} ${{ github.event.inputs.sha }}
