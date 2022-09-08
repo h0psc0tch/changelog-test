@@ -40,4 +40,7 @@ jobs:
             SHA=$(cat prod-deployment-sha.txt)
             echo "DEPLOYSHA=$SHA" >> $GITHUB_ENV
       - name: 'Display sha'
-        run: echo "${{ env.DEPLOYSHA }}"
+        run: > 
+          echo Production Deployment SHA "${{ env.DEPLOYSHA }}"
+      - name: 'Show changelog'
+        run: scripts/git/changelog.sh ${{ env.DEPLOYSHA }} ${{ github.event.inputs.sha }}

@@ -25,7 +25,7 @@ jobs:
     steps:
     # Runs a single command using the runners shell
     - name: 'Save deployment sha'
-      run: echo "${{ github.event.inputs.sha }}" >> production-sha.txt
+      run: echo "${{ github.event.inputs.sha }}" >> prod-deployment-sha.txt
     - name: 'Upload sha artifact'
       uses: actions/upload-artifact@v3
       with:
