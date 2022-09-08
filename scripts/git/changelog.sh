@@ -1,9 +1,10 @@
 #!/bin/bash
+git version
+git rev-parse --abbrev-ref HEAD
+git branch --show-current
 
-if [ "main" != $(git branch --show-current) ]; then
+if [ "main" != "$(git branch --show-current)" ]; then
   echo "cannot generate changelog outside of main"
-  git rev-parse --abbrev-ref HEAD
-  git branch --show-current
   exit
 fi
 
