@@ -8,6 +8,7 @@ fi
 
 if [ -z "$1" ]; then
   echo "no prod SHA supplied"
+  echo "This is where we can send a default notification that a manual changelog is required"
   exit
 fi
 
@@ -17,6 +18,8 @@ if [ -z "$2" ]; then
 fi
 
 URLPREFIX=https://github.com/h0psc0tch/changelog-test/commit/
+
+git pull > /dev/null
 
 echo "Prod SHA: $1"
 echo "Stag SHA: $2"
