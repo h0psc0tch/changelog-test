@@ -6,15 +6,14 @@ if [ "main" != "$(git branch --show-current)" ]; then
   exit
 fi
 
-if [ -z "$1" ]; then
-  echo "no prod SHA supplied"
-  echo "This is where we can send a default notification that a manual changelog is required"
-  exit
-fi
+# We need two SHAs to perform generate the changelog
+if [ -z "$1" ] || [ -z "$2" ]; then
 
-if [ -z "$2" ]; then
-  echo "no staging SHA supplied"
-  exit
+  # If either SHA is missing, create a standard message to add to the slack message
+  # The most likely reason for a missing SHA is that one has not been stored by the prod deployment
+  printf "Missing SHA\n"
+  printf 'Prod SHA: %s\n' "$1"
+  printf 'Staging SHA: %s\n' "$2"
 fi
 
 URLPREFIX=https://github.com/h0psc0tch/changelog-test/commit/

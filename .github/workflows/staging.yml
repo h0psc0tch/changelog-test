@@ -54,4 +54,4 @@ jobs:
       # Generate the changelog between the two SHAs, production deployment and current deployment
       # If no production sha is supplied, then notify so a manual generation can be performed
       - name: 'Show changelog'
-        run: scripts/git/changelog.sh ${{ env.DEPLOYSHA }} ${{ github.event.inputs.sha }}
+        run: scripts/git/changelog.sh "${{ env.DEPLOYSHA }}" "${{ github.event.inputs.sha }}"
