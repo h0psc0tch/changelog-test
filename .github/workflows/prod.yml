@@ -16,18 +16,55 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "greet"
-  persist-sha:
-    # The type of runner that the job will run on
+  # Generate the changelog for this staging deployment from the commit history between this deployment
+  # and the current production deployment, which is identified by its SHA stored in a deployment artifact
+  changelog:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Runs a single command using the runners shell
-    - name: 'Save deployment sha'
-      run: echo "${{ github.event.inputs.sha }}" >> prod-deployment-sha.txt
-    - name: 'Upload sha artifact'
-      uses: actions/upload-artifact@v3
-      with:
-        name: prod-deployment-sha
-        path: prod-deployment-sha.txt
+      # Download the artifact, from the last production deployment, which contains the SHA for that deployment
+      - name: 'Download workflow artifact'
+        uses: dawidd6/action-download-artifact@v2.23.0
+        with:
+          workflow: prod.yml            #this is the name of the production deployment github action
+          name: prod-deployment-sha     #this is the name of the artifact within that action run
+          if_no_artifact_found: warn    #don't want to fail a deployment if no artifact found, so warn
+      
+      # Read the value from the downloaded artifact into a variable, fail if no file found, but don't
+      # fail the job.
+      - name: 'Set variables'
+        continue-on-error: true
+        run: |
+          if [ -f prod-deployment-sha.txt ]; then
+            SHA=$(cat prod-deployment-sha.txt)
+            echo "PREVSHA=$SHA" >> $GITHUB_ENV
+          else
+            exit 1
+          fi
+      
+      # Checkout the repo in order to run a git revision history command on it in the next step
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 #this is required to ensure that the necessary history is pulled down
+      
+      # Generate the changelog between the two SHAs, prev production deployment and current deployment
+      # If no prev sha is supplied, then notify so a manual generation can be performed
+      - name: 'Show changelog'
+        run: scripts/git/changelog.sh "${{ env.PREVSHA }}" "${{ github.event.inputs.sha }}"
+        
+  persist-deployment-sha:
+    # This step stores the SHA for the current deployment so that it can be referenced by other jobs,
+    # specifically, the next production deployment workflow so that it can generate a changelog.
+    # N.B. *** THIS MUST BE EXECUTED AFTER THE CHANGELOG JOB *** to ensure a valid changelog.
+    name: Save SHA for changelog
+    runs-on: ubuntu-latest
+    steps:
+      # Write the deployment sha to a file that can then be stored as an artifact
+      - name: 'Write sha to file'
+        run: echo "${{ github.event.inputs.sha }}" >> prod-deployment-sha.txt
+      # Upload the file containing the sha as an artifact, so that it can be referenced later
+      - name: 'Upload sha artifact'
+        uses: actions/upload-artifact@v3
+        with:
+          name: prod-deployment-sha
+          path: prod-deployment-sha.txt

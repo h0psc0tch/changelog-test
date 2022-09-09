@@ -14,6 +14,7 @@ if [ -z "$1" ] || [ -z "$2" ]; then
   printf "Missing SHA\n"
   printf 'Prod SHA: %s\n' "$1"
   printf 'Staging SHA: %s\n' "$2"
+  exit
 fi
 
 URLPREFIX=https://github.com/h0psc0tch/changelog-test/commit/
