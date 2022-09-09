@@ -55,9 +55,10 @@ jobs:
   persist-deployment-sha:
     # This step stores the SHA for the current deployment so that it can be referenced by other jobs,
     # specifically, the next production deployment workflow so that it can generate a changelog.
-    # N.B. *** THIS MUST BE EXECUTED AFTER THE CHANGELOG JOB *** to ensure a valid changelog.
     name: Save SHA for changelog
     runs-on: ubuntu-latest
+    needs:
+      - changelog # N.B. *** THIS MUST BE EXECUTED AFTER THE CHANGELOG JOB *** to ensure a valid changelog.
     steps:
       # Write the deployment sha to a file that can then be stored as an artifact
       - name: 'Write sha to file'
