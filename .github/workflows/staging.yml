@@ -46,10 +46,10 @@ jobs:
             fi
 
       # Checkout the repo in order to run a git revision history command on it in the next step
-#      - name: Checkout
-#        uses: actions/checkout@v3
-#        with:
-#          fetch-depth: 0 #this is required to ensure that the necessary history is pulled down
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 #this is required to ensure that the necessary history is pulled down
 
       # Generate the changelog between the two SHAs, production deployment and current deployment
       # If no production sha is supplied, then notify so a manual generation can be performed

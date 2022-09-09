@@ -19,8 +19,6 @@ fi
 
 URLPREFIX=https://github.com/h0psc0tch/changelog-test/commit/
 
-git pull > /dev/null
-
 echo "Prod SHA: $1"
 echo "Stag SHA: $2"
 echo "Commits included in release:"
