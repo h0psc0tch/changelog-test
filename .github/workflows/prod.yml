@@ -26,6 +26,7 @@ jobs:
       - name: 'Download workflow artifact'
         uses: dawidd6/action-download-artifact@v2.23.0
         with:
+          workflow: prod2.yml            # WILL BREAK
           name: prod-deployment-sha     #this is the name of the artifact within that action run
           if_no_artifact_found: warn    #don't want to fail a deployment if no artifact found, so warn
       
